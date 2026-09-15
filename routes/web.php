@@ -26,6 +26,8 @@ Route::middleware('auth')->group(function (): void {
     Route::middleware('role:siswa')->group(function (): void {
         Route::get('/siswa/dashboard', [PresensiController::class, 'index'])->name('siswa.dashboard');
         Route::post('/siswa/presensi', [PresensiController::class, 'store'])->name('siswa.presensi.store');
+        Route::post('/siswa/pengajuan-izin', [PresensiController::class, 'storePengajuanIzin'])
+            ->name('siswa.pengajuan-izin.store');
     });
 
     Route::middleware('role:wali_kelas')->prefix('wali-kelas')->name('wali-kelas.')->group(function (): void {

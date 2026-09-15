@@ -11,7 +11,7 @@
 
 <!-- NAVBAR -->
 <nav class="sticky top-0 z-30 bg-gray-950/90 backdrop-blur border-b border-gray-800">
-    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         <div class="flex items-center gap-2 shrink-0">
             <span class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -28,6 +28,7 @@
                 @endif
             </button>
             <button data-tab="riwayat" class="tab-btn relative px-4 py-1.5 rounded-md text-sm font-medium text-gray-400 transition">Riwayat Saya</button>
+            <button data-tab="izin" class="tab-btn relative px-4 py-1.5 rounded-md text-sm font-medium text-gray-400 transition">Izin/Sakit</button>
             <button data-tab="jadwal" class="tab-btn relative px-4 py-1.5 rounded-md text-sm font-medium text-gray-400 transition">Jadwal</button>
         </div>
 
@@ -54,6 +55,7 @@
         <button data-tab="dasbor" class="tab-btn px-3 py-1.5 rounded-md text-xs font-medium text-gray-400 whitespace-nowrap">Dasbor</button>
         <button data-tab="tandai" class="tab-btn px-3 py-1.5 rounded-md text-xs font-medium text-gray-400 whitespace-nowrap">Tandai Kehadiran</button>
         <button data-tab="riwayat" class="tab-btn px-3 py-1.5 rounded-md text-xs font-medium text-gray-400 whitespace-nowrap">Riwayat Saya</button>
+        <button data-tab="izin" class="tab-btn px-3 py-1.5 rounded-md text-xs font-medium text-gray-400 whitespace-nowrap">Izin/Sakit</button>
         <button data-tab="jadwal" class="tab-btn px-3 py-1.5 rounded-md text-xs font-medium text-gray-400 whitespace-nowrap">Jadwal</button>
         @if($user->isWaliKelas())
         <a href="{{ route('wali-kelas.mata-kuliah.index') }}" class="px-3 py-1.5 rounded-md text-xs font-medium text-gray-400 whitespace-nowrap border border-gray-800">Kelola Mata Kuliah</a>
@@ -61,7 +63,11 @@
     </div>
 </nav>
 
-<main class="max-w-7xl mx-auto px-6 py-8">
+<main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 sm:py-8">
+
+    @if (session('success'))
+        <p class="mb-6 rounded-lg border border-emerald-900 bg-emerald-950 px-4 py-3 text-sm text-emerald-300">{{ session('success') }}</p>
+    @endif
 
     {{-- =============== DASBOR =============== --}}
     <section id="tab-dasbor" class="tab-section space-y-6">
@@ -248,6 +254,64 @@
         </div>
     </section>
 
+    {{-- =============== PENGAJUAN IZIN / SAKIT =============== --}}
+    <section id="tab-izin" class="tab-section hidden space-y-6">
+        <div>
+            <h1 class="text-2xl font-bold">Pengajuan Izin/Sakit</h1>
+            <p class="mt-1 text-gray-500">Kirim alasan dan file bukti agar wali kelas dapat melakukan verifikasi.</p>
+        </div>
+
+        @if ($errors->any())
+            <div class="rounded-xl border border-red-900 bg-red-950 p-4 text-sm text-red-200">
+                <p class="font-medium">Pengajuan belum dapat dikirim.</p>
+                <ul class="mt-2 list-inside list-disc space-y-1">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+            </div>
+        @endif
+
+        <div class="grid gap-6 lg:grid-cols-5">
+            <form method="POST" action="{{ route('siswa.pengajuan-izin.store') }}" enctype="multipart/form-data" class="grid gap-5 rounded-xl border border-gray-800 bg-gray-900 p-5 sm:p-6 lg:col-span-3">
+                @csrf
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <label class="grid gap-2 text-sm">Tanggal
+                        <input type="date" name="tanggal" max="{{ today()->format('Y-m-d') }}" value="{{ old('tanggal', today()->format('Y-m-d')) }}" required class="rounded-md border border-gray-700 bg-gray-950 px-3 py-2.5">
+                    </label>
+                    <label class="grid gap-2 text-sm">Jenis pengajuan
+                        <select name="jenis" required class="rounded-md border border-gray-700 bg-gray-950 px-3 py-2.5">
+                            <option value="izin" @selected(old('jenis') === 'izin')>Izin</option>
+                            <option value="sakit" @selected(old('jenis') === 'sakit')>Sakit</option>
+                        </select>
+                    </label>
+                </div>
+                <label class="grid gap-2 text-sm">Alasan
+                    <textarea name="alasan" required maxlength="1000" rows="4" class="rounded-md border border-gray-700 bg-gray-950 px-3 py-2.5" placeholder="Jelaskan alasan izin atau sakit.">{{ old('alasan') }}</textarea>
+                </label>
+                <label class="grid gap-2 text-sm">File bukti
+                    <input type="file" name="lampiran" required accept=".jpg,.jpeg,.png,.pdf" class="rounded-md border border-dashed border-gray-700 bg-gray-950 px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white">
+                    <span class="text-xs text-gray-500">JPG, JPEG, PNG, atau PDF. Maksimum 2 MB.</span>
+                </label>
+                <button class="rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium hover:bg-blue-500">Kirim Pengajuan</button>
+            </form>
+
+            <section class="rounded-xl border border-gray-800 bg-gray-900 p-5 sm:p-6 lg:col-span-2">
+                <h2 class="font-semibold">Status Pengajuan</h2>
+                <div class="mt-4 space-y-4">
+                    @forelse ($pengajuanIzins as $pengajuan)
+                        <article class="border-b border-gray-800 pb-4 last:border-0 last:pb-0">
+                            <div class="flex items-start justify-between gap-3">
+                                <div><p class="font-medium">{{ ucfirst($pengajuan->jenis) }}</p><p class="text-xs text-gray-500">{{ $pengajuan->tanggal->translatedFormat('d M Y') }}</p></div>
+                                <span class="rounded-full px-2.5 py-1 text-xs font-medium {{ $pengajuan->status === 'disetujui' ? 'bg-emerald-500/10 text-emerald-400' : ($pengajuan->status === 'ditolak' ? 'bg-red-500/10 text-red-400' : 'bg-amber-500/10 text-amber-400') }}">{{ ucfirst($pengajuan->status) }}</span>
+                            </div>
+                            <p class="mt-2 text-sm text-gray-400">{{ $pengajuan->alasan }}</p>
+                            @if ($pengajuan->catatan_verifikasi)<p class="mt-2 text-xs text-gray-500">Catatan wali kelas: {{ $pengajuan->catatan_verifikasi }}</p>@endif
+                        </article>
+                    @empty
+                        <p class="text-sm text-gray-500">Belum ada pengajuan.</p>
+                    @endforelse
+                </div>
+            </section>
+        </div>
+    </section>
+
     {{-- =============== RIWAYAT SAYA =============== --}}
     <section id="tab-riwayat" class="tab-section hidden space-y-6">
         <div>
@@ -397,7 +461,7 @@
         });
     }
     document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
-    switchTab('dasbor');
+    switchTab(@js($errors->any() ? 'izin' : session('active_tab', 'dasbor')));
 
     document.querySelectorAll('.subtab-btn').forEach(btn => {
         btn.addEventListener('click', () => {

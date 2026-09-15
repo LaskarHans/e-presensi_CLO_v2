@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePengajuanIzinRequest;
 use App\Models\MataKuliah;
+use App\Models\PengajuanIzin;
 use App\Models\Presensi;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -30,6 +33,11 @@ class PresensiController extends Controller
 
         $riwayat = Presensi::with('mataKuliah')
             ->where('user_id', $user?->id)
+            ->get();
+        $pengajuanIzins = PengajuanIzin::query()
+            ->where('siswa_id', $user?->id)
+            ->latest('tanggal')
+            ->latest('id')
             ->get();
 
         $totalPertemuan = $riwayat->count();
@@ -75,8 +83,26 @@ class PresensiController extends Controller
         return view('presensi', compact(
             'user', 'today', 'hariIni', 'urutanHari', 'jadwalMingguan', 'kelasHariIni', 'presensiHariIni',
             'rekapPerMatkul', 'aktivitasTerbaru', 'riwayat', 'totalPertemuan', 'totalHadir', 'totalTerlambat',
-            'totalTidakHadir', 'tingkatKehadiran', 'matkulBerisiko', 'ditandaiHariIni', 'statusColor'
+            'totalTidakHadir', 'tingkatKehadiran', 'matkulBerisiko', 'ditandaiHariIni', 'statusColor', 'pengajuanIzins'
         ));
+    }
+
+    public function storePengajuanIzin(StorePengajuanIzinRequest $request): RedirectResponse
+    {
+        $validated = $request->validated();
+        $lampiranPath = $request->file('lampiran')->store('pengajuan-izin/'.$request->user()->id, 'public');
+
+        PengajuanIzin::create([
+            'siswa_id' => $request->user()->id,
+            'tanggal' => $validated['tanggal'],
+            'jenis' => $validated['jenis'],
+            'alasan' => $validated['alasan'],
+            'lampiran_path' => $lampiranPath,
+        ]);
+
+        return redirect()->route('siswa.dashboard')
+            ->with('success', 'Pengajuan '.$validated['jenis'].' berhasil dikirim dan menunggu verifikasi.')
+            ->with('active_tab', 'izin');
     }
 
     public function store(Request $request)

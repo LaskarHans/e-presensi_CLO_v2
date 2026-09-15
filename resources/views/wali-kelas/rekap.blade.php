@@ -7,14 +7,18 @@
     @vite(['resources/css/app.css'])
 </head>
 <body class="min-h-screen bg-gray-950 text-gray-100 antialiased">
-    <main class="mx-auto max-w-5xl px-6 py-10">
+    <main class="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
         <a href="{{ route('wali-kelas.dashboard') }}" class="text-sm text-blue-400 hover:text-blue-300">← Kembali ke dasbor</a>
         <div class="mt-4">
             <p class="text-sm text-blue-400">{{ $kelas->tingkat }} · {{ $kelas->nama }}</p>
             <h1 class="text-3xl font-bold">Rekap Kehadiran Kelas</h1>
         </div>
 
-        <form method="GET" action="{{ route('wali-kelas.rekap') }}" class="mt-8 grid gap-4 rounded-xl border border-gray-800 bg-gray-900 p-5 md:grid-cols-4">
+        <div class="mt-8 flex flex-wrap items-center justify-between gap-3">
+            <p class="text-sm text-gray-400">Pilih bulan atau rentang tanggal khusus.</p>
+            <button type="button" onclick="window.print()" class="rounded-lg border border-gray-700 px-4 py-2 text-sm font-medium hover:bg-gray-900 print:hidden">Cetak / Simpan PDF</button>
+        </div>
+        <form method="GET" action="{{ route('wali-kelas.rekap') }}" class="mt-4 grid gap-4 rounded-xl border border-gray-800 bg-gray-900 p-5 md:grid-cols-4 print:hidden">
             <label class="grid gap-2 text-sm">Bulan
                 <input type="month" name="bulan" value="{{ request('bulan', $tanggalMulai->format('Y-m')) }}" class="rounded-md border border-gray-700 bg-gray-950 px-3 py-2">
             </label>

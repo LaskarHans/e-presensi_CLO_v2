@@ -8,13 +8,13 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 
-    class PresensiSeeder extends Seeder
+class PresensiSeeder extends Seeder
 {
     private array $namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
     public function run(): void
     {
-        $user = User::first();
+        $user = User::where('nomor_induk', '0012345678')->first();
         if (! $user) {
             return;
         }

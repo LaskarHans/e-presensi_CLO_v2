@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\MataKuliah;
 use App\Models\Presensi;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -12,12 +11,11 @@ class PresensiController extends Controller
 {
     private array $namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
-    public function index()
+    public function index(Request $request)
     {
         Carbon::setLocale('id');
 
-        // Sementara belum ada login: pakai mahasiswa pertama sebagai user aktif
-        $user = auth()->user() ?? User::first();
+        $user = $request->user();
         $today = Carbon::today();
         $hariIni = $this->namaHari[$today->dayOfWeek];
         $urutanHari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
@@ -87,7 +85,7 @@ class PresensiController extends Controller
             'mata_kuliah_id' => 'required|exists:mata_kuliahs,id',
         ]);
 
-        $user = auth()->user() ?? User::first();
+        $user = $request->user();
         $mataKuliah = MataKuliah::findOrFail($request->mata_kuliah_id);
 
         $sudahAda = Presensi::where('user_id', $user?->id)

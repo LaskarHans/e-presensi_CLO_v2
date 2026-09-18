@@ -22,6 +22,7 @@ Route::middleware('auth')->group(function (): void {
     })->name('dashboard');
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+    Route::get('/logout', fn () => redirect()->route('login'));
 
     Route::middleware('role:siswa')->group(function (): void {
         Route::get('/siswa/dashboard', [PresensiController::class, 'index'])->name('siswa.dashboard');
@@ -43,3 +44,5 @@ Route::middleware('auth')->group(function (): void {
         Route::resource('mata-kuliah', MataKuliahController::class)->except(['show']);
     });
 });
+
+Route::fallback(fn () => redirect()->route('login'));

@@ -47,6 +47,12 @@
             <div class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-sm font-semibold">
                 {{ collect(explode(' ', $user->name ?? 'T U'))->map(fn($w) => strtoupper($w[0] ?? ''))->take(2)->implode('') }}
             </div>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="border border-gray-800 hover:border-gray-700 rounded-lg px-3 py-2 text-xs font-medium text-gray-400 hover:text-gray-100 transition">
+                    Logout
+                </button>
+            </form>
         </div>
     </div>
 

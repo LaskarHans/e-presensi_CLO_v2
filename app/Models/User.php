@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'nim', 'prodi', 'angkatan'])]
+#[Fillable(['name', 'email', 'password', 'role', 'nomor_induk', 'nim', 'prodi', 'angkatan'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -28,5 +28,15 @@ class User extends Authenticatable
     public function presensis()
     {
         return $this->hasMany(Presensi::class);
+    }
+
+    public function siswaProfile()
+    {
+        return $this->hasOne(SiswaProfile::class);
+    }
+
+    public function kelasWali()
+    {
+        return $this->hasOne(Kelas::class, 'wali_kelas_id');
     }
 }

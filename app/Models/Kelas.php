@@ -6,6 +6,7 @@ use Database\Factories\KelasFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Kelas extends Model
 {
@@ -35,5 +36,10 @@ class Kelas extends Model
         return $this->belongsToMany(User::class, 'wali_kelas_kelas', 'kelas_id', 'wali_kelas_id')
             ->withPivot(['aktif', 'mulai_pada', 'selesai_pada'])
             ->withTimestamps();
+    }
+
+    public function siswaProfiles(): HasMany
+    {
+        return $this->hasMany(SiswaProfile::class);
     }
 }

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Kelas;
+use App\Models\SiswaProfile;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -50,6 +51,11 @@ class DatabaseSeeder extends Seeder
                 'aktif' => true,
                 'mulai_pada' => today()->toDateString(),
             ];
+
+            SiswaProfile::updateOrCreate(
+                ['user_id' => $siswaUser->id],
+                ['kelas_id' => $kelas->id],
+            );
         }
 
         $kelas->siswa()->sync($siswa);

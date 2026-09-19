@@ -3,18 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePengajuanIzinRequest;
+use App\Http\Requests\UpdateNamaSiswaRequest;
 use App\Models\MataKuliah;
 use App\Models\PengajuanIzin;
 use App\Models\Presensi;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\View\View;
 
 class PresensiController extends Controller
 {
     private array $namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         Carbon::setLocale('id');
 
@@ -87,6 +90,18 @@ class PresensiController extends Controller
         ));
     }
 
+    public function updateNama(UpdateNamaSiswaRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        $user->update([
+            'name' => trim($request->validated('name')),
+        ]);
+
+        return redirect()->route('siswa.dashboard')
+            ->with('success', 'Nama Anda berhasil diperbarui. Wali kelas akan melihat perubahan ini.');
+    }
+
     public function storePengajuanIzin(StorePengajuanIzinRequest $request): RedirectResponse
     {
         $validated = $request->validated();
@@ -105,7 +120,7 @@ class PresensiController extends Controller
             ->with('active_tab', 'izin');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $request->validate([
             'mata_kuliah_id' => 'required|exists:mata_kuliahs,id',

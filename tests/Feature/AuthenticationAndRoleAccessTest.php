@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Kelas;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
@@ -76,6 +77,46 @@ class AuthenticationAndRoleAccessTest extends TestCase
         $this->actingAs($siswa)
             ->get(route('siswa.dashboard'))
             ->assertSuccessful();
+    }
+
+    public function test_siswa_can_update_their_display_name_and_wali_kelas_can_see_it(): void
+    {
+        $siswa = User::factory()->siswa()->create([
+            'name' => 'Nama Lama',
+            'nomor_induk' => '0012345678',
+        ]);
+        $waliKelas = User::factory()->waliKelas()->create([
+            'nomor_induk' => '1987654321',
+        ]);
+        $kelas = Kelas::factory()->create();
+
+        $kelas->siswa()->attach($siswa, [
+            'aktif' => true,
+            'mulai_pada' => '2026-07-01',
+        ]);
+        $kelas->waliKelas()->attach($waliKelas, [
+            'aktif' => true,
+            'mulai_pada' => '2026-07-01',
+        ]);
+
+        $this->withoutVite();
+
+        $this->actingAs($siswa)
+            ->patch(route('siswa.nama.update'), [
+                'name' => 'Bunga Citra Lestari',
+            ])
+            ->assertRedirect(route('siswa.dashboard'))
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $siswa->id,
+            'name' => 'Bunga Citra Lestari',
+        ]);
+
+        $this->actingAs($waliKelas)
+            ->get(route('wali-kelas.dashboard'))
+            ->assertSuccessful()
+            ->assertSeeText('Bunga Citra Lestari');
     }
 
     public function test_login_rejects_invalid_credentials(): void

@@ -26,6 +26,7 @@ Route::middleware('auth')->group(function (): void {
 
     Route::middleware('role:siswa')->group(function (): void {
         Route::get('/siswa/dashboard', [PresensiController::class, 'index'])->name('siswa.dashboard');
+        Route::patch('/siswa/nama', [PresensiController::class, 'updateNama'])->name('siswa.nama.update');
         Route::post('/siswa/presensi', [PresensiController::class, 'store'])->name('siswa.presensi.store');
         Route::post('/siswa/pengajuan-izin', [PresensiController::class, 'storePengajuanIzin'])
             ->name('siswa.pengajuan-izin.store');

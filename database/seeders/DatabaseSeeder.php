@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
         $waliKelas = User::updateOrCreate(
             ['nomor_induk' => '999'],
             [
-                'name' => 'Wali Kelas XI RPL 1',
+                'name' => 'Anis Sandra P., M.Psi., Psikolog., Gr.',
                 'email' => 'wali.kelas.999@e-hadir.test',
                 'role' => 'wali_kelas',
                 'password' => Hash::make('999'),
